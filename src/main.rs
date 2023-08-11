@@ -35,7 +35,7 @@ fn main() {
 
 fn clear_log() {
     let mut driveletter = get_drive_letter(r"Riot Games\Riot Client");
-    if !driveletter.is_empty() {
+    if driveletter.is_empty() {
         println!("Couldn't identify riot installation drive.");
         driveletter = read_input("Please input the drive letter/path to the riot folder (Example: A:\\):");
         if driveletter.is_empty() {
@@ -51,7 +51,7 @@ fn clear_log() {
         println!("Drive letter identified as {}", driveletter);
     }
     let mut windriveletter = get_drive_letter(r"ProgramData\Riot Games");
-    if !driveletter.is_empty() {
+    if driveletter.is_empty() {
         println!("Couldn't identify ProgramData folder.");
         windriveletter = read_input("Please input the drive letter/path to the ProgramData folder (Example: A:\\):");
         if windriveletter.is_empty() {
