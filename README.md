@@ -6,6 +6,8 @@ Just run it, it should figure out the right directories by itself.
 # Usage
 Download exe from releases and run. Should do everything else automatically.
 
+You might run into the issue that it can't find the path, then it will ask you to input the path to the folder.
+
 # Build
 Clone this repository using
 ```
