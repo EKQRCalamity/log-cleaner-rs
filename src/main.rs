@@ -1,4 +1,4 @@
-use std::process::Command;
+use std::process::{Command, exit};
 use std::time::Duration;
 use std::{io, thread};
 use std::path::{Path, PathBuf};
@@ -34,16 +34,41 @@ fn main() {
 }
 
 fn clear_log() {
-    let mut driveletter = get_drive_letter();
-    if driveletter.is_empty() {
+    let mut driveletter = get_drive_letter(r"Riot Games\Riot Client");
+    if !driveletter.is_empty() {
         println!("Couldn't identify riot installation drive.");
-        driveletter = read_input("Please input the drive letter (Example: A):") + r":/";
+        driveletter = read_input("Please input the drive letter/path to the riot folder (Example: A:\\):");
+        if driveletter.is_empty() {
+            exit(0);
+        }
+        if driveletter.ends_with("Riot Games") {
+            driveletter = driveletter.strip_suffix("Riot Games").expect("Error removing substr").to_owned();
+        }
+        if driveletter.ends_with("Riot Games\\") {
+            driveletter = driveletter.strip_suffix("Riot Games\\").expect("Error removing substr").to_owned();
+        }
     } else {
         println!("Drive letter identified as {}", driveletter);
     }
+    let mut windriveletter = get_drive_letter(r"ProgramData\Riot Games");
+    if !driveletter.is_empty() {
+        println!("Couldn't identify ProgramData folder.");
+        windriveletter = read_input("Please input the drive letter/path to the ProgramData folder (Example: A:\\):");
+        if windriveletter.is_empty() {
+            exit(0);
+        }
+        if windriveletter.ends_with("ProgramData") {
+            windriveletter = windriveletter.strip_suffix("ProgramData").expect("Error removing substr").to_owned();
+        }
+        if windriveletter.ends_with("ProgramData\\") {
+            windriveletter = windriveletter.strip_suffix("ProgramData\\").expect("Error removing substr").to_owned();
+        }
+    } else {
+        println!("Windows drive letter identified as {}", windriveletter);
+    }
     let paths_to_delete = vec![
-        format!("{}ProgramData\\Riot Games\\", driveletter),
-        format!("{}ProgramData\\Riot Games\\machine.cfg", driveletter),
+        format!("{}ProgramData\\Riot Games\\", windriveletter),
+        format!("{}ProgramData\\Riot Games\\machine.cfg", windriveletter),
         format!("{}Riot Games\\League of Legends\\Config", driveletter),
         format!("{}Riot Games\\League of Legends\\Logs", driveletter),
         format!("{}Riot Games\\League of Legends\\debug.log", driveletter),
@@ -107,8 +132,7 @@ fn get_riot_appdata_folder() -> Option<PathBuf> {
 }
 
 
-fn get_drive_letter() -> String {
-    let file_path = r"Riot Games\Riot Client";
+fn get_drive_letter(file_path: &str) -> String {
     let drives = get_available_drives();
     let drive_l: String = "".to_string();
     for drive in drives {
