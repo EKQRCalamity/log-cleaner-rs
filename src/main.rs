@@ -4,6 +4,9 @@ use std::{io, thread};
 use std::path::{Path, PathBuf};
 use dirs::{config_dir, config_local_dir};
 use std::fs;
+extern crate colored;
+
+use colored::*;
 
 pub fn read_input(prompt: &str) -> String {
     use std::io::Write;
@@ -67,8 +70,8 @@ fn clear_log() {
         println!("Windows drive letter identified as {}", windriveletter);
     }
     let paths_to_delete = vec![
-        format!("{}ProgramData\\Riot Games\\", windriveletter),
         format!("{}ProgramData\\Riot Games\\machine.cfg", windriveletter),
+        format!("{}ProgramData\\Riot Games\\", windriveletter),
         format!("{}Riot Games\\League of Legends\\Config", driveletter),
         format!("{}Riot Games\\League of Legends\\Logs", driveletter),
         format!("{}Riot Games\\League of Legends\\debug.log", driveletter),
@@ -79,6 +82,8 @@ fn clear_log() {
         format!("{}Riot Games\\Riot Client\\UX\\GPUCache\\", driveletter),
     ];
 
+    let mut not_found = false;
+
     for path in paths_to_delete {
         if Path::new(path.as_str()).exists() {
             match delete_path(Path::new(path.as_str())) {
@@ -87,6 +92,7 @@ fn clear_log() {
             }
         } else {
             println!("{} not found", (if path.split("\\").last().unwrap().is_empty() { format!("{}ProgramData\\Riot Games", driveletter).to_string() } else { path.split("\\").last().unwrap().to_string() } ));
+            not_found = true;
         }
     }
 
@@ -99,6 +105,12 @@ fn clear_log() {
         
     } else {
         println!("Riot Games appdata folder not found.");
+        not_found = true;
+    }
+    if not_found {
+        let out = "Seems that one or more files werent found. Maybe the clean went wrong or this is the second time you started it since logout.".red();
+        println!("{}", out);
+        exit_in(15);
     }
 }
 
